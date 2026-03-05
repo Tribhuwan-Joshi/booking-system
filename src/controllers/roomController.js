@@ -1,11 +1,11 @@
 const roomService = require("../services/roomService");
 
-async function getRooms(req, res) {
+async function getRooms(req, res, next) {
     try {
         const rooms = await roomService.getRooms();
         res.json(rooms);
     } catch (err) {
-        res.status(500).json({ error: "Failed to fetch rooms" });
+        next(err);
     }
 }
 

@@ -1,21 +1,18 @@
 const db = require("../config/db");
 const bookingModel = require("../models/bookingModel");
+const AppError = require("../utils/AppError");
 
 async function checkAvailability(roomId, startDate, endDate) {
-    const connection = await db.getConnection();
+    const [rows] = await db.query(
+        `SELECT id
+     FROM bookings
+     WHERE room_id = ?
+     AND start_date <= ?
+     AND end_date >= ?`,
+        [roomId, endDate, startDate]
+    );
 
-    try {
-        const rows = await bookingModel.findOverlap(
-            connection,
-            roomId,
-            startDate,
-            endDate
-        );
-
-        return rows.length === 0;
-    } finally {
-        connection.release();
-    }
+    return rows.length === 0;
 }
 
 async function createBooking(userId, roomId, startDate, endDate) {
@@ -24,32 +21,34 @@ async function createBooking(userId, roomId, startDate, endDate) {
     try {
         await connection.beginTransaction();
 
-        const overlap = await bookingModel.findOverlap(
-            connection,
-            roomId,
-            startDate,
-            endDate
+        const [overlap] = await connection.query(
+            `SELECT id
+       FROM bookings
+       WHERE room_id = ?
+       AND start_date <= ?
+       AND end_date >= ?
+       FOR UPDATE`,
+            [roomId, endDate, startDate]
         );
 
         if (overlap.length > 0) {
-            throw new Error("Room already booked for selected dates");
+            throw new AppError("Room already booked for selected dates", 400);
         }
 
-        const bookingId = await bookingModel.createBooking(
-            connection,
-            userId,
-            roomId,
-            startDate,
-            endDate
+        const [result] = await connection.query(
+            `INSERT INTO bookings (user_id, room_id, start_date, end_date)
+       VALUES (?, ?, ?, ?)`,
+            [userId, roomId, startDate, endDate]
         );
 
         await connection.commit();
 
-        return bookingId;
+        return result.insertId;
 
     } catch (err) {
         await connection.rollback();
         throw err;
+
     } finally {
         connection.release();
     }

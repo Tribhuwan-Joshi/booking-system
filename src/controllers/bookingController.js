@@ -1,12 +1,11 @@
 const bookingService = require("../services/bookingService");
+const AppError = require("../utils/AppError");
 
-async function checkAvailability(req, res) {
+async function checkAvailability(req, res, next) {
     const { roomId, startDate, endDate } = req.body;
 
     if (!roomId || !startDate || !endDate) {
-        return res.status(400).json({
-            error: "roomId, startDate and endDate are required"
-        });
+        return next(new AppError("roomId, startDate and endDate are required", 400));
     }
 
     try {
@@ -17,19 +16,20 @@ async function checkAvailability(req, res) {
         );
 
         res.json({ available });
-
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 }
 
-async function createBooking(req, res) {
+async function createBooking(req, res, next) {
     const { roomId, startDate, endDate } = req.body;
 
     if (!roomId || !startDate || !endDate) {
-        return res.status(400).json({
-            error: "roomId, startDate and endDate are required"
-        });
+        return next(new AppError("roomId, startDate and endDate are required", 400));
+    }
+
+    if (new Date(startDate) > new Date(endDate)) {
+        return next(new AppError("Invalid date range", 400));
     }
 
     try {
@@ -46,7 +46,7 @@ async function createBooking(req, res) {
         });
 
     } catch (err) {
-        res.status(400).json({ error: err.message });
+        next(err);
     }
 }
 
