@@ -5,7 +5,7 @@ async function findOverlap(connection, roomId, startDate, endDate) {
         `SELECT id FROM bookings
      WHERE room_id = ?
      AND start_date <= ?
-     AND end_date >= ?`,
+     AND end_date >= ? FOR UPDATE`,
         [roomId, endDate, startDate]
     );
     return rows;
