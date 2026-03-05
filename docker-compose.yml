@@ -9,7 +9,7 @@ services:
     ports:
       - "3307:3306"
     volumes:
-      - ./src/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./src/db/initDB.sql:/docker-entrypoint-initdb.d/init.sql
       - mysql_data:/var/lib/mysql
 
 volumes:
