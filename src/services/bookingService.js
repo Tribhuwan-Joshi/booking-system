@@ -1,5 +1,4 @@
 const db = require("../config/db");
-const bookingModel = require("../models/bookingModel");
 const AppError = require("../utils/AppError");
 
 async function checkAvailability(roomId, startDate, endDate) {

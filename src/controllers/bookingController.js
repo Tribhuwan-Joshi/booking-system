@@ -7,6 +7,10 @@ async function checkAvailability(req, res, next) {
     if (!roomId || !startDate || !endDate) {
         return next(new AppError("roomId, startDate and endDate are required", 400));
     }
+    if (new Date(startDate) > new Date(endDate)) {
+        return next(new AppError("Invalid date range", 400));
+    }
+
 
     try {
         const available = await bookingService.checkAvailability(

@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Room Booking System API</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="room-booking-system-api">Room Booking System API</h1>
+<p>A REST API built with Node.js and Express for managing room bookings.<br>
+The system allows users to register, login, view available rooms, check availability for a date range, and book rooms while preventing overlapping bookings.</p>
+<p>The application uses <strong>MySQL</strong> as the database and runs MySQL through <strong>Docker</strong> to simplify setup.</p>
+<h2 id="tech-stack">Tech Stack</h2>
+<h3 id="backend-framework">Backend framework</h3>
+<p>Node.js with Express</p>
+<h3 id="database">Database</h3>
+<p>MySQL 8 running inside Docker</p>
+<h3 id="authentication">Authentication</h3>
+<p>JWT based authentication</p>
+<h3 id="security-and-middleware">Security and middleware</h3>
+<p>Helmet for security headers<br>
+CORS for cross origin requests<br>
+Express Rate Limit for API rate limiting<br>
+Custom error middleware</p>
+<h3 id="password-hashing">Password hashing</h3>
+<p>bcrypt</p>
+<h3 id="database-driver">Database driver</h3>
+<p>mysql2 with connection pooling</p>
+<h3 id="containerization">Containerization</h3>
+<p>Docker and Docker Compose</p>
+<h2 id="setup">Setup</h2>
+<p><em>Note - Docker is required because the MySQL database runs inside a Docker container.</em></p>
+<h3 id="step-1">Step 1</h3>
+<p>Clone the repository</p>
+<pre><code class="language-bash">git <span class="hljs-built_in">clone</span> git@github.com:Tribhuwan-Joshi/booking-system.git
+<span class="hljs-built_in">cd</span> booking-system
+</code></pre>
+<h3 id="step-2">Step 2</h3>
+<p>Create <code>.env</code> file in the root.</p>
+<p>Setup your secrets and password.<br>
+You can use these as example.</p>
+<pre><code class="language-env">PORT=3000
+
+DB_HOST=localhost
+DB_PORT=3307
+DB_USER=root
+DB_PASSWORD=password
+DB_NAME=room_booking
+
+JWT_SECRET=your_secret_key
+</code></pre>
+<p>You can generate a robust key using:</p>
+<pre><code class="language-bash">openssl rand -<span class="hljs-built_in">base64</span> 32
+</code></pre>
+<h3 id="step-3">Step 3</h3>
+<p>Start the MySQL DB using docker and install dependencies.</p>
+<pre><code class="language-bash">docker compose up -d
+</code></pre>
+<p>This command will:</p>
+<p>Start a MySQL container<br>
+Create the <code>room_booking</code> database<br>
+Run the SQL initialization script automatically</p>
+<p>To access DB manually and check status you can enter into mysql:</p>
+<pre><code class="language-bash">docker <span class="hljs-built_in">exec</span> -it room-booking-mysql mysql -uroot -p
+</code></pre>
+<p>Install dependencies:</p>
+<pre><code class="language-bash">npm install
+</code></pre>
+<p>Run the application:</p>
+<pre><code class="language-bash">npm run dev
+</code></pre>
+<p>The API will run at</p>
+<pre><code>http://localhost:3000
+</code></pre>
+<h2 id="api">API</h2>
+<p>Base URL</p>
+<pre><code>http://localhost:3000
+</code></pre>
+<p>You can test these APIs using any API client like Postman or Insomnia.</p>
+<h2 id="authentication-1">Authentication</h2>
+<h3 id="register">Register</h3>
+<pre><code>POST /auth/register
+</code></pre>
+<p>Request body</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;John Doe&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;email&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;john@example.com&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;password&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;password123&quot;</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p>Response</p>
+<p>Status 201</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;userId&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;token&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;jwt_token_here&quot;</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p>Possible errors</p>
+<p>Status 400</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;error&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Email already registered&quot;</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<h3 id="login">Login</h3>
+<pre><code>POST /auth/login
+</code></pre>
+<p>Request Body</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;email&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;john@example.com&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;password&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;password123&quot;</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p>Response</p>
+<p>Status 200</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;userId&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;token&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;jwt_token_here&quot;</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p>Possible errors</p>
+<p>Status 401</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;error&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Invalid credentials&quot;</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<h2 id="rooms">Rooms</h2>
+<h3 id="get-all-rooms">Get All Rooms</h3>
+<pre><code>GET /rooms
+</code></pre>
+<p>Authentication not required</p>
+<p>Response</p>
+<p>Status 200</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span>
+  <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Standard Room&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;price_per_night&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1200</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Deluxe Room&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;price_per_night&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">2000</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Suite&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;price_per_night&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">3500</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">]</span>
+</code></pre>
+<p>Possible errors</p>
+<p>Status 500</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;error&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Internal server error&quot;</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<h2 id="bookings">Bookings</h2>
+<h3 id="check-room-availability">Check Room Availability</h3>
+<pre><code>POST /bookings/check
+</code></pre>
+<p>Authentication required</p>
+<p>Header</p>
+<pre><code>Authorization: Bearer &lt;token&gt;
+</code></pre>
+<p>Request body</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;roomId&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;startDate&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2026-03-10&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;endDate&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2026-03-12&quot;</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p>Response</p>
+<p>Status 200</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;available&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-keyword">true</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p>Possible errors</p>
+<p>Status 400</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;error&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;roomId, startDate and endDate are required&quot;</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<h3 id="create-booking">Create Booking</h3>
+<pre><code>POST /bookings
+</code></pre>
+<p>Authentication required</p>
+<p>Header</p>
+<pre><code>Authorization: Bearer &lt;token&gt;
+</code></pre>
+<p>Request body</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;roomId&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;startDate&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2026-03-10&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;endDate&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2026-03-12&quot;</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p>Response</p>
+<p>Status 201</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Booking confirmed&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;bookingId&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">5</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p>Possible errors</p>
+<p>Status 400</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;error&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Room already booked for selected dates&quot;</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p>Status 400</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;error&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Invalid date range&quot;</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p>Status 401</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;error&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Invalid or expired token&quot;</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+
+            
+            
+        </body>
+        </html>
