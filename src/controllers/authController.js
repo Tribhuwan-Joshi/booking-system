@@ -8,6 +8,16 @@ async function register(req, res, next) {
         return next(new AppError("name, email and password are required", 400));
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+        return next(new AppError("Invalid email format", 400));
+    }
+
+    if (password.length < 6) {
+        return next(new AppError("Password must be at least 6 characters long", 400));
+    }
+
     try {
         const result = await authService.register(name, email, password);
         res.status(201).json(result);
