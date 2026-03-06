@@ -1,0 +1,18 @@
+Architecture Notes
+
+1. Overlapping
+For overlapping I am checking if there are any bookings where the startDate is smaller than or equal to the requested endDate and the endDate is greater than or equal to the requested startDate. This logic is similar to the merge interval problem.
+
+SELECT id FROM bookings
+WHERE room_id = ?
+AND start_date <= ?
+AND end_date >= ?
+FOR UPDATE
+
+Note that I am also locking the row to prevent dirty writes using FOR UPDATE.
+
+2. If two users try to book at the same time, the transaction comes into play if the room id is the same. It will first lock the row so the other user has to wait until the first query gets committed or rolled back. This helps maintain the integrity of the database.
+
+Note that I am using pooling for queries. It opens a limited number of connections which can be reused by clients. But if it is a transaction then I create a dedicated connection using db.getConnection().
+
+3. I can scale this system by adding caching using Redis, using a more robust validation layer with Joi or Zod since the current validation is minimal, using Oauth 2.0 for better UX and authentication, running multiple instances behind a load balancer, and adding a proper logging or telemetry system.
